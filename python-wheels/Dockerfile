@@ -24,7 +24,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 FROM base AS wheel-builder
 
 WORKDIR /opt
-COPY python-builds/python3-*.tgz /opt/
+COPY python-builds/python3*.tgz /opt/
 # Reuse toolchains from base stage
 COPY --from=base /opt/toolchain /opt/toolchain
 

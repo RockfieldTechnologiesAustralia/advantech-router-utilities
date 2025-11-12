@@ -10,15 +10,19 @@ if [ "$PACKAGES" = "/tmp/default-requirements.txt" ]; then
   echo "pydantic-core>=2" > "$PACKAGES"
 fi
 
-files=(/opt/python3-*.tgz)
+files=(/opt/python3*.tgz)
 if [ ${#files[@]} -eq 0 ]; then
-  echo "No python3-*.tgz files found in /opt"
+  echo "No python3*.tgz files found in /opt"
   exit 1
 fi
 
 
 for f in "${files[@]}"; do
-  ver=$(basename "$f" .tgz | sed 's/^python3-//')
+  [[ "$f" == *python3* ]] || { echo "Error: filename must contain 'python3'"; exit 1; }
+
+  ver=$(basename "$f" .tgz | sed 's/.*-//')
+
+  # Suffix contains the router app version, e.g. v3, v4, etc.
   suffix=$(echo "$ver" | sed -E 's/.*\.(v[0-9a-z]+)$/\1/')
  
   # Check if the linker exists and is executable

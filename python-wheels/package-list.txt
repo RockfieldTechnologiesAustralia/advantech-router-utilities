@@ -1,3 +1,2 @@
-pydantic>=2.0
 pydantic-core>=2.0
 pyftpdlib>=2.0.1
