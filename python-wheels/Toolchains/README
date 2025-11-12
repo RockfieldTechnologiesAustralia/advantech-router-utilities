@@ -1,0 +1,72 @@
+GNU Toolchains for ARM processors
+=================================
+
+Supported platforms
+-------------------
+
+  * V2i routers (ARM 926EJ-S)
+  * V3 routers (ARM Cortex-A8)
+  * V4 routers (ARM Cortex-A72)
+  * V4i routers (ARM Cortex-A53)
+
+Requirements
+------------
+
+  * 64-bit Linux distribution
+  * 1 GB of free space in /opt
+
+Install instructions
+--------------------
+
+  ```
+  dpkg -i deb/*.deb
+  ```
+
+  or
+
+  ```
+  rpm -i rpm/*.rpm
+  ```
+
+Directory structure
+-------------------
+
+```
+  Toolchains
+   |
+   |--deb                       DEB packages
+   |   |
+   |   |--gcc-icr-v2i-armv5-*   GNU Toolchain for ARM 926EJ-S processors
+   |   |--gcc-icr-v3-armv7-*    GNU Toolchain for ARM Cortex-A8 processors
+   |   |--gcc-icr-v4-aarch64-*  GNU Toolchain for ARM Cortex-A72 processors
+   |   +--gcc-icr-v4i-aarch64-* GNU Toolchain for ARM Cortex-A53 processors
+   |
+   |--rpm                       RPM packages
+   |   |
+   |   |--gcc-icr-v2i-armv5-*   GNU Toolchain for ARM 926EJ-S processors
+   |   |--gcc-icr-v3-armv7-*    GNU Toolchain for ARM Cortex-A8 processors
+   |   |--gcc-icr-v4-aarch64-*  GNU Toolchain for ARM Cortex-A72 processors
+   |   +--gcc-icr-v4i-aarch64-* GNU Toolchain for ARM Cortex-A53 processors
+   |
+   |--COPYING                   GNU General Public License version 2
+   |--COPYING.LIB               GNU Lesser General Public License version 2.1
+   |--COPYING.RUNTIME           GCC Runtime Library Exception version 3.1
+   |--COPYING3                  GNU General Public License version 3
+   |--COPYING3.LIB              GNU Lesser General Public License version 3
+   +--README                    This file
+```
+
+Source code
+-----------
+
+  The GNU Binutils
+    https://ftp.gnu.org/gnu/binutils/
+
+  The GNU Compiler Collection
+    https://ftp.gnu.org/gnu/gcc/
+
+  The GNU C Library
+    https://ftp.gnu.org/gnu/glibc/
+
+  The Linux Kernel
+    https://www.kernel.org/pub/linux/kernel/
