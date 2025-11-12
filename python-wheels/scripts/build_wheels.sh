@@ -2,8 +2,13 @@
 set -eux
 shopt -s nullglob
 
-# PACKAGES is passed as a comma-separated list in requirement.txt format via ARG/ENV. Defaults to pydantic-core only.
-PACKAGES=${PACKAGES:-pydantic-core>=2}
+# PACKAGES is a path to a requirements.txt file. Defaults to a temp file with pydantic-core>=2.
+PACKAGES=${PACKAGES:-/tmp/default-requirements.txt}
+
+# If using the default, create the file
+if [ "$PACKAGES" = "/tmp/default-requirements.txt" ]; then
+  echo "pydantic-core>=2" > "$PACKAGES"
+fi
 
 files=(/opt/python3-*.tgz)
 if [ ${#files[@]} -eq 0 ]; then
@@ -42,7 +47,11 @@ for f in "${files[@]}"; do
   export CARGO_BUILD_TARGET=armv7-unknown-linux-gnueabi
   export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_LINKER=$CC
 
-  for spec in $(echo $PACKAGES | tr ',' ' '); do
+  # Read requirements.txt line by line
+  while IFS= read -r spec || [ -n "$spec" ]; do
+    # Skip empty lines and comments
+    [[ -z "$spec" || "$spec" =~ ^# ]] && continue
+
     echo ">>> Downloading source for $spec"
     rm -rf /src/$spec; mkdir -p /src/$spec
 
@@ -81,7 +90,7 @@ for f in "${files[@]}"; do
       cp dist/*.whl /dist/$ver/$pkg/
     fi
     echo ">>> Finished $pkg for Python $ver"
-  done
+  done < "$PACKAGES"
   echo "============================================================"
 done
 

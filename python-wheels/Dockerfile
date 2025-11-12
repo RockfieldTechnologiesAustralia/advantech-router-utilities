@@ -23,8 +23,6 @@ ENV PATH="/root/.local/bin:${PATH}"
 # ------------------------------------------------------------
 FROM base AS wheel-builder
 
-ARG PACKAGES="pydantic-core>=2,requests"
-
 WORKDIR /opt
 COPY python-builds/python3-*.tgz /opt/
 # Reuse toolchains from base stage
@@ -35,10 +33,13 @@ RUN apt-get update && apt-get install -y python3 python3-pip
 RUN uv tool install maturin
 
 COPY scripts/build_wheels.sh /usr/local/bin/build_wheels.sh
+COPY package-list.txt /tmp/package-list.txt
+
 RUN chmod +x /usr/local/bin/build_wheels.sh
 
 RUN ls -l /opt && ls -l /opt/toolchain
 
+ARG PACKAGES="/tmp/package-list.txt"
 RUN /usr/local/bin/build_wheels.sh
 
 # ------------------------------------------------------------

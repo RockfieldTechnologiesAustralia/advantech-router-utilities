@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import os
-import shutil
 import argparse
+import shutil
 from pathlib import Path
+
 
 def generate_indexes(src: Path, dest: Path):
     dest.mkdir(parents=True, exist_ok=True)
@@ -12,6 +12,7 @@ def generate_indexes(src: Path, dest: Path):
         if not versiondir.is_dir():
             continue
         version = versiondir.name
+        print(f"Processing python package distribution version: {version}")
         version_simple = dest / version / "simple"
         version_simple.mkdir(parents=True, exist_ok=True)
 
@@ -21,12 +22,14 @@ def generate_indexes(src: Path, dest: Path):
             if not pkgdir.is_dir():
                 continue
             pkgname = pkgdir.name
+            print(f"  Found package: {pkgname}")
             pkg_simple = version_simple / pkgname
             pkg_simple.mkdir(parents=True, exist_ok=True)
 
             index_lines = [f"<html><body><h1>{pkgname}</h1>"]
             for whl in sorted(pkgdir.glob("*.whl")):
                 dest_whl = pkg_simple / whl.name
+                print(f"    Copying wheel '{whl.name}' into '{dest_whl}'")
                 shutil.copy2(whl, dest_whl)
                 index_lines.append(f'<a href="{whl.name}">{whl.name}</a><br/>')
             index_lines.append("</body></html>")
