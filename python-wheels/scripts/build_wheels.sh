@@ -52,10 +52,16 @@ for f in "${files[@]}"; do
     # Remove all whitespace (spaces, tabs, newlines, carriage returns) everywhere
     spec=$(echo "$spec" | tr -d '[:space:]')
 
+    # Remove leading and trailing single/double quotes if present
+    spec="${spec%\"}"   # strip trailing double quote
+    spec="${spec#\"}"   # strip leading double quote
+    spec="${spec%\'}"   # strip trailing single quote
+    spec="${spec#\'}"   # strip leading single quote
+
     # Skip empty lines and comments
     [[ -z "$spec" || "$spec" =~ ^# ]] && continue
 
-    echo ">>> Downloading source for $spec"
+    echo ">>> Downloading source for '$spec'"
     rm -rf /src/$spec; mkdir -p /src/$spec
 
     # Use the full specifier with pip
@@ -66,9 +72,13 @@ for f in "${files[@]}"; do
     pkg=$(echo "$spec" | sed 's/[<>=!].*//')
     norm_pkg=${pkg//-/_}
 
-    tarball=$(ls -1 ${pkg}-*.tar.gz 2>/dev/null || ls -1 ${norm_pkg}-*.tar.gz)
+    # Search for tarball matching both hyphen and underscore variants
+    shopt -s nullglob
+    files=( ${pkg}-*.tar.gz ${norm_pkg}-*.tar.gz )
+    tarball="${files[0]}"
     if [ ! -f "$tarball" ]; then
-      echo "!!! ERROR: No tarball found for $spec (checked $pkg and $norm_pkg)"
+      echo "!!! ERROR: No tarball found for $spec (checked [$pkg] and [$norm_pkg])"
+      ls -l
       exit 1
     fi 
     mkdir -p /src/$pkg
