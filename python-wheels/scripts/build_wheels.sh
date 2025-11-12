@@ -49,6 +49,9 @@ for f in "${files[@]}"; do
 
   # Read requirements.txt line by line
   while IFS= read -r spec || [ -n "$spec" ]; do
+    # Trim trailing whitespace (spaces, tabs, newlines, carriage returns)
+    spec="${spec%"${spec##*[![:space:]]}"}"
+
     # Skip empty lines and comments
     [[ -z "$spec" || "$spec" =~ ^# ]] && continue
 
