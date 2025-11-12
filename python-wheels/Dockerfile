@@ -15,7 +15,7 @@ RUN dpkg -i Toolchains/deb/*.deb
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 # Advantech routers have ARMv5, ARMv7, and AArch64 CPUs
-RUN rustup target add armv5-unknown-linux-gnueabi
+# RUN rustup target add armv5-unknown-linux-gnueabi  # ARMv5 is not supported by rustup
 RUN rustup target add armv7-unknown-linux-gnueabi
 RUN rustup target add aarch64-unknown-linux-gnu
 # Install uv
