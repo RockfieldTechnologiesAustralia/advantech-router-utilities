@@ -26,15 +26,14 @@ jobs:
           docker cp $container_id:/dist ./dist
           docker rm $container_id
 
-      - name: Generate HTML indexes
-        working-directory: ./python-wheels
+      - name: Generate HTML indexes for /wheels directory
         run: |
-          python3 scripts/build_index.py ./dist ./public
+          python3 ./python-wheels/scripts/build_index.py ./python-wheels/dist ./public/wheels
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./python-wheels/public
+          path: ./public
 
   deploy:
     needs: build
