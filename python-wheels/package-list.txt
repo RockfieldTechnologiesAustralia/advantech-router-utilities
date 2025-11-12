@@ -1,1 +1,2 @@
 requests
+pydantic-core>=2.0
