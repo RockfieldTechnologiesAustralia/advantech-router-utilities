@@ -24,9 +24,26 @@ for f in "${files[@]}"; do
 
   # Suffix contains the router app version, e.g. v3, v4, etc.
   suffix=$(echo "$ver" | sed -E 's/.*\.(v[0-9a-z]+)$/\1/')
+
+  # Find the toolchain directory that matches the suffix
+  toolchain_dirs=(/opt/toolchain/gcc-icr-${suffix}-*-linux-gnu*)
+  if [ ${#toolchain_dirs[@]} -eq 0 ]; then
+    echo "!!! ERROR: No toolchain directory found for suffix=$suffix"
+    exit 1
+  fi
+  toolchain_dir="${toolchain_dirs[0]}"
+  echo ">>> Using toolchain directory: $toolchain_dir"
+
+  # Detect architecture from directory name
+  arch=$(basename "$toolchain_dir" | sed -E 's/gcc-icr-'${suffix}'-([^-]+)-linux-gnu.*/\1/')
+  echo ">>> Detected architecture: $arch"
+
+   # Detect ABI from directory name
+  abi=$(basename "$toolchain_dir" | sed -E 's/.*-linux-//')  # gnu, gnueabi, gnueabihf, etc.
+  echo ">>> Detected ABI: $abi"
  
   # Check if the linker exists and is executable
-  linker="/opt/toolchain/gcc-icr-${suffix}-armv7-linux-gnueabi/bin/armv7-linux-gnueabi-gcc"
+  linker="/opt/toolchain/gcc-icr-${suffix}-${arch}-linux-${abi}/bin/${arch}-linux-${abi}-gcc"
   if [ -x "$linker" ]; then
     echo ">>> Linker found: $linker"
   else
@@ -35,21 +52,21 @@ for f in "${files[@]}"; do
   fi 
 
   echo "============================================================"
-  echo ">>> Starting builds for Python $ver (toolchain suffix=$suffix)"
-  echo ">>> Extracting $f into /opt/armv7-python-$ver"
-  mkdir -p /opt/armv7-python-$ver
-  tar -xzf "$f" -C /opt/armv7-python-$ver --strip-components=1
+  echo ">>> Starting builds for Python $ver (toolchain suffix=$suffix, arch=$arch, abi=$abi)"
+  echo ">>> Extracting $f into /opt/$arch-python-$ver"
+  mkdir -p /opt/$arch-python-$ver
+  tar -xzf "$f" -C /opt/$arch-python-$ver --strip-components=1
 
   echo ">>> Setting cross-compilation environment for suffix=$suffix"
   export CC=$linker
-  export CXX=/opt/toolchain/gcc-icr-$suffix-armv7-linux-gnueabi/bin/armv7-linux-gnueabi-g++
-  export SYSROOT=/opt/toolchain/gcc-icr-$suffix-armv7-linux-gnueabi/sysroot
+  export CXX=/opt/toolchain/gcc-icr-$suffix-$arch-linux-$abi/bin/$arch-linux-$abi-g++
+  export SYSROOT=/opt/toolchain/gcc-icr-$suffix-$arch-linux-$abi/sysroot
   export CPPFLAGS="-I${SYSROOT}/usr/include"
   export LDFLAGS="-L${SYSROOT}/usr/lib"
-  export LD_LIBRARY_PATH=/opt/armv7-python-$ver/lib
-  export PYO3_CROSS_PYTHON_PATH=/opt/armv7-python-$ver/bin/python3
-  export CARGO_BUILD_TARGET=armv7-unknown-linux-gnueabi
-  export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_LINKER=$CC
+  export LD_LIBRARY_PATH=/opt/$arch-python-$ver/lib
+  export PYO3_CROSS_PYTHON_PATH=/opt/$arch-python-$ver/bin/python3
+  export CARGO_BUILD_TARGET=$arch-unknown-linux-$abi
+  export CARGO_TARGET_${arch^^}_UNKNOWN_LINUX_${abi^^}_LINKER=$CC
 
   # Read requirements.txt line by line
   while IFS= read -r spec || [ -n "$spec" ]; do
@@ -96,7 +113,7 @@ for f in "${files[@]}"; do
       # Use maturin for Rust-based packages
       echo ">>> Detected Cargo.toml, using maturin for build"
       pymajmin=$(echo "$ver" | cut -d. -f1-2)
-      maturin build -i python${pymajmin} --release --target armv7-unknown-linux-gnueabi --manylinux off
+      maturin build -i python${pymajmin} --release --target $CARGO_BUILD_TARGET --manylinux off
       mkdir -p /dist/$ver/$pkg
       cp target/wheels/*.whl /dist/$ver/$pkg/
     else
