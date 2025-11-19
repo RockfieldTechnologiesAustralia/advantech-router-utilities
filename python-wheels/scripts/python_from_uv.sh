@@ -30,10 +30,10 @@ then
   uv python install -i ${TMP_DIR} ${PYTHON_VERSION}
 fi
 
-INTERP_VERSION=$(cat ${TMP_DIR}/${PYTHON_VERSION}/lib/python3*/_sysconfig_vars__linux_arm-linux-gnueabi.json | jq -r '.VERSION')
+INTERPRETER_VERSION=$(cat ${TMP_DIR}/${PYTHON_VERSION}/lib/python3*/_sysconfig_vars__linux_arm-linux-gnueabi.json | jq -r '.VERSION')
 
-echo $INTERP_VERSION
-OUTPUT_PATH="${BASE_PATH}/../python-builds/python3-${INTERP_VERSION}.${ADVANTECH_PACKAGE_VERSION}.tgz"
+echo $INTERPRETER_VERSION
+OUTPUT_PATH="${BASE_PATH}/../python-builds/python3-${INTERPRETER_VERSION}.${ADVANTECH_PACKAGE_VERSION}.tgz"
 
 echo ${OUTPUT_PATH}
 
@@ -42,7 +42,7 @@ then
   echo "Renaming directory"
   mv ${TMP_DIR}/${PYTHON_VERSION} ${TMP_DIR}/python3
   pushd ${TMP_DIR}
-
   tar -czavf ${OUTPUT_PATH} python3
+  rm -Rf python3
   popd
 fi
