@@ -8,6 +8,10 @@ The list of available packages is found in `python-wheels/package-list.txt`
 
 To use the wheels for a specific python version and router version use:
 
- `pip install mercuto-client --extra-index-url https://RockfieldTechnologiesAustralia.github.io/advantech-router-utilities/wheels/3.12.9.v3/simple/`
+Router App `v3`:
 
-Where `3.12.9.v3` is the python version and router app version installed on the router. E.g. python 3.12.9, using router app version v3.
+ `pip install mercuto-client --extra-index-url https://RockfieldTechnologiesAustralia.github.io/advantech-router-utilities/wheels/v3/simple/`
+
+Router App `v4`:
+
+ `pip install mercuto-client --extra-index-url https://RockfieldTechnologiesAustralia.github.io/advantech-router-utilities/wheels/v4/simple/`
