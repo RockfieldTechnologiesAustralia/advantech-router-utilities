@@ -83,7 +83,7 @@ for f in "${files[@]}"; do
     [[ -z "$spec" || "$spec" =~ ^# ]] && continue
 
     echo ">>> Downloading source for '$spec'"
-    rm -rf /src/$spec; mkdir -p /src/$spec
+    rm -rf /src/$suffix/$spec; mkdir -p /src/$suffix/$spec
 
     # Use the full specifier with pip
     env -i PATH="$PATH" HOME="$HOME" python3 -m pip download "$spec" --no-binary :all: --no-deps
@@ -102,26 +102,26 @@ for f in "${files[@]}"; do
       ls -l
       exit 1
     fi 
-    mkdir -p /src/$pkg
-    echo ">>> Extracting $tarball into /src/$pkg"
-    tar -xvf "$tarball" --strip-components=1 -C /src/$pkg
+    mkdir -p /src/$suffix/$pkg
+    echo ">>> Extracting $tarball into /src/$suffix/$pkg"
+    tar -xvf "$tarball" --strip-components=1 -C /src/$suffix/$pkg
 
     echo ">>> Building wheel for $spec on Python $ver"
-    cd /src/$pkg
+    cd /src/$suffix/$pkg
 
     if [ -f Cargo.toml ]; then
       # Use maturin for Rust-based packages
       echo ">>> Detected Cargo.toml, using maturin for build"
       pymajmin=$(echo "$ver" | cut -d. -f1-2)
       maturin build -i python${pymajmin} --release --target $CARGO_BUILD_TARGET --manylinux off
-      mkdir -p /dist/$ver/$pkg
-      cp target/wheels/*.whl /dist/$ver/$pkg/
+      mkdir -p /dist/$suffix/$pkg
+      cp target/wheels/*.whl /dist/$suffix/$pkg
     else
       # Use standard build process for others
       echo ">>> Using standard build process for $pkg"
       uv build
-      mkdir -p /dist/$ver/$pkg
-      cp dist/*.whl /dist/$ver/$pkg/
+      mkdir -p /dist/$suffix/$pkg
+      cp dist/*.whl /dist/$suffix/$pkg
     fi
     echo ">>> Finished $pkg for Python $ver"
   done < "$PACKAGES"
